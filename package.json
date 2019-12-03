@@ -1,11 +1,11 @@
 {
-  "name": "nodebb-plugin-sso-oauth",
-  "version": "0.3.4",
-  "description": "NodeBB Generic OAuth SSO",
+  "name": "nodebb-plugin-rom-oauth",
+  "version": "0.1.0",
+  "description": "NodeBB ROM OAuth",
   "main": "library.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/julianlam/nodebb-plugin-sso-oauth"
+    "url": "https://github.com/NaturalSolutions/nodebb-plugin-rom-oauth"
   },
   "keywords": [
     "nodebb",
@@ -18,12 +18,12 @@
     "registration"
   ],
   "author": {
-    "name": "Julian Lam",
-    "email": "julian@nodebb.org"
+    "name": "Natural Solutions",
+    "email": "contact@natural-solutions.eu"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/julianlam/nodebb-plugin-sso-oauth/issues"
+    "url": "https://github.com/NaturalSolutions/nodebb-plugin-rom-oauth/issues"
   },
   "readme": "",
   "readmeFilename": "README.md",
