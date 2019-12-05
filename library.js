@@ -28,47 +28,34 @@
 	const winston = module.parent.require('winston');
 
 	/**
-	 * REMEMBER
-	 *   Never save your OAuth Key/Secret or OAuth2 ID/Secret pair in code! It could be published and leaked accidentally.
-	 *   Save it into your config.json file instead:
-	 *
-	 *   {
-	 *     ...
-	 *     "oauth": {
-	 *       "id": "someoauthid",
-	 *       "secret": "youroauthsecret"
-	 *     }
-	 *     ...
-	 *   }
-	 *
-	 *   ... or use environment variables instead:
-	 *
-	 *   `OAUTH__ID=someoauthid OAUTH__SECRET=youroauthsecret node app.js`
+	 * In conf.json add the entry rom_auth which contains :
+	 * "type": "<'oauth' | 'oauth2'>"
+	 * "name": "<use 'rom' or any other lowercase string>",
+	 * If type = 'oauth'
+	 * "options": {
+	 *  	"requestTokenURL": "",
+	 *		"accessTokenURL": "",
+	 *		"userAuthorizationURL": "",
+	 *		"consumerKey": "",
+	 *		"consumerSecret": "",
+	 * }
+	 * If type = 'oauth2'
+	 * "options": {
+     *      "clientID": "",
+     *      "clientSecret": "",
+     *      "authorizationURL": "",
+     *      "tokenURL": ""
+     * }
+	 * 
 	 */
 
-	const constants = Object.freeze({
-		type: 'oauth2',	// Either 'oauth' or 'oauth2'
-		name: 'rom',	// Something unique to your OAuth provider in lowercase, like "github", or "nodebb"
-		oauth: {
-			requestTokenURL: '',
-			accessTokenURL: '',
-			userAuthorizationURL: '',
-			consumerKey: nconf.get('oauth:key'),	// don't change this line
-			consumerSecret: nconf.get('oauth:secret'),	// don't change this line
-		},
-		oauth2: {
-			authorizationURL: 'http://localhost:3000/oauth2/authorize',
-			tokenURL: 'http://localhost:3000/oauth2/token',
-			clientID: nconf.get('oauth:id'),	// don't change this line
-			clientSecret: nconf.get('oauth:secret'),	// don't change this line
-		},
-		userRoute: 'http://localhost:3000/user',	// This is the address to your app's "user profile" API endpoint (expects JSON)
-	});
+	const constants = Object.freeze(nconf.get('rom_oauth'));
 
 	const OAuth = {};
 	let configOk = false;
 	let passportOAuth;
-	let opts;
+	let opts = Object.assign({}, constants.options);
+	opts.callbackURL = nconf.get('url') + '/auth/' + constants.name + '/callback';
 
 	if (!constants.name) {
 		winston.error('[sso-oauth] Please specify a name for your OAuth provider (library.js:32)');
@@ -86,8 +73,8 @@
 
 			if (constants.type === 'oauth') {
 				// OAuth options
-				opts = constants.oauth;
-				opts.callbackURL = nconf.get('url') + '/auth/' + constants.name + '/callback';
+				//opts = constants.oauth;
+				//opts.callbackURL = nconf.get('url') + '/auth/' + constants.name + '/callback';
 
 				passportOAuth.Strategy.prototype.userProfile = function (token, secret, params, done) {
 					this._oauth.get(constants.userRoute, token, secret, function (err, body/* , res */) {
@@ -110,8 +97,8 @@
 				};
 			} else if (constants.type === 'oauth2') {
 				// OAuth 2 options
-				opts = constants.oauth2;
-				opts.callbackURL = nconf.get('url') + '/auth/' + constants.name + '/callback';
+				//opts = constants.oauth2;
+				//opts.callbackURL = nconf.get('url') + '/auth/' + constants.name + '/callback';
 
 				passportOAuth.Strategy.prototype.userProfile = function (accessToken, done) {
 					this._oauth2.get(constants.userRoute, accessToken, function (err, body/* , res */) {
@@ -175,7 +162,7 @@
 		// console.log(data);
 
 		var profile = {};
-		profile.id = data.id;
+		profile.id = data._id.$oid;
 		profile.displayName = data.nickname;
 		profile.emails = [{ value: data.email }];
 
